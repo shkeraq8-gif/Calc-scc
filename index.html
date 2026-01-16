@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>SSVC0059 Pro</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; padding: 15px; background: #f2f2f7; color: #000; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 360px; margin: auto; margin-bottom: 15px; }
+        h3 { text-align: center; margin: 0 0 15px 0; color: #007aff; font-size: 1.1em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .calib-section { background: #f9f9fb; border: 1px dashed #d1d1d6; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        label { display: block; margin-top: 10px; font-size: 11px; color: #8e8e93; text-transform: uppercase; }
+        input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #d1d1d6; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fff; font-weight: bold; }
+        .res-main { margin-top: 20px; background: #28cd41; color: white; padding: 15px; border-radius: 12px; text-align: center; transition: 0.3s; }
+        .warning { background: #ff3b30 !important; }
+        .res-val { font-size: 2em; font-weight: bold; display: block; }
+        .load-info { font-size: 12px; margin-top: 10px; text-align: center; color: #8e8e93; }
+        .btn-reset { width: 100%; margin-top: 15px; padding: 12px; background: #ff3b30; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; }
+        .calib-res { color: #007aff; font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h3>1. КАЛИБРОВКА КЛАПАНА</h3>
+        <div class="calib-section">
+            <label>Собрано жидкости (мл):</label>
+            <input type="number" id="cal_ml" placeholder="Напр: 380" oninput="runCalib()">
+            <label>Время замера (сек):</label>
+            <input type="number" id="cal_sec" placeholder="Напр: 100" oninput="runCalib()">
+            <p style="font-size: 12px; margin-top: 10px; text-align: center;">
+                ИТОГ: <span id="cal_res" class="calib-res">0.0</span> мл/сек
+            </p>
+        </div>
+
+        <h3>2. РАСЧЕТ ПЕРИОДА</h3>
+        <label>Пропускная (мл/сек):</label>
+        <input type="number" id="cap" placeholder="Автозаполнение или ввод" step="0.1" oninput="calc()">
+       
+        <label>T-on (Открытие, сек):</label>
+        <input type="number" id="ton" placeholder="Напр: 0.90" step="0.01" oninput="calc()">
+       
+        <label>Целевой отбор (мл/час):</label>
+        <input type="number" id="flow" placeholder="Напр: 1800" oninput="calc()">
+
+        <div id="resBox" class="res-main">
+            <small>УСТАНОВИТЕ ПЕРИОД (T-period):</small>
+            <span id="tperiod" class="res-val">0.0</span>
+        </div>
+
+        <div class="load-info">
+            Нагрузка: <span id="loadVal">0</span>% | <span id="loadText">Лимит 20%</span>
+        </div>
+
+        <button class="btn-reset" onclick="resetAll()">ОЧИСТИТЬ ВСЁ</button>
+    </div>
+
+    <script>
+    function runCalib() {
+        const ml = parseFloat(document.getElementById('cal_ml').value);
+        const sec = parseFloat(document.getElementById('cal_sec').value);
+        if (ml > 0 && sec > 0) {
+            const res = ml / sec;
+            document.getElementById('cal_res').innerText = res.toFixed(2);
+            document.getElementById('cap').value = res.toFixed(2);
+            calc();
+        }
+    }
+
+    function calc() {
+        const cap = parseFloat(document.getElementById('cap').value);
+        const ton = parseFloat(document.getElementById('ton').value);
+        const flow = parseFloat(document.getElementById('flow').value);
+        const resBox = document.getElementById('resBox');
+        const tDisp = document.getElementById('tperiod');
+        const loadText = document.getElementById('loadText');
+       
+        if (cap > 0 && ton > 0 && flow > 0) {
+            let period = (cap * ton * 3600) / flow;
+            if (period > 999.9) {
+                tDisp.innerText = "MAX";
+                resBox.classList.add('warning');
+                return;
+            }
+            const load = (ton / period) * 100;
+            tDisp.innerText = period.toFixed(1);
+            document.getElementById('loadVal').innerText = Math.round(load);
+           
+            if (load > 20) {
+                resBox.classList.add('warning');
+                loadText.innerText = "ПЕРЕГРЕВ!";
+            } else {
+                resBox.classList.remove('warning');
+                loadText.innerText = "БЕЗОПАСНО";
+            }
+        } else {
+            tDisp.innerText = "0.0";
+            resBox.classList.remove('warning');
+        }
+    }
+
+    function resetAll() {
+        ['cal_ml','cal_sec','cap','ton','flow'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('cal_res').innerText = '0.0';
+        document.getElementById('tperiod').innerText = '0.0';
+        document.getElementById('loadVal').innerText = '0';
+        document.getElementById('loadText').innerText = 'Лимит 20%';
+        document.getElementById('resBox').classList.remove('warning');
+    }
+
+    window.onload = resetAll;
+    </script>
+</body>
+</html>
