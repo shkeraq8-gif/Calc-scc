@@ -30,7 +30,7 @@
             <label>Время замера (сек):</label>
             <input type="number" id="cal_sec" placeholder="100" oninput="runCalib()">
             <p style="font-size: 13px; margin-top: 12px; text-align: center;">
-                ПРОПУСКНАЯ: <span id="cal_res" class="calib-res">0.00</span> мл/сек
+                ПРОПУСКНАЯ: <span id="cal_res">0.00</span> мл/сек
             </p>
         </div>
 
@@ -46,7 +46,7 @@
         <input type="number" id="flow" placeholder="1800" oninput="calc()">
 
         <div id="resBox" class="res-main">
-            <small>ВРЕМЯ ЗАКРЫТИЯ КЛАПАНА:</small>
+            <small id="resTitle">ВРЕМЯ ЗАКРЫТИЯ КЛАПАНА:</small>
             <span id="tperiod" class="res-val">0.0</span>
             <small>Точность до десятых (0.1)</small>
         </div>
@@ -62,7 +62,7 @@
     function runCalib() {
         const ml = parseFloat(document.getElementById('cal_ml').value);
         const sec = parseFloat(document.getElementById('cal_sec').value);
-        if (ml > 0 && sec > 0) {
+        if (!isNaN(ml) && !isNaN(sec) && sec > 0) {
             const res = ml / sec;
             document.getElementById('cal_res').innerText = res.toFixed(2);
             document.getElementById('cap').value = res.toFixed(2);
@@ -73,4 +73,54 @@
     function calc() {
         const cap = parseFloat(document.getElementById('cap').value);
         const ton = parseFloat(document.getElementById('ton').value);
-        const flow = parseFloat(document
+        const flow = parseFloat(document.getElementById('flow').value);
+        
+        const resBox = document.getElementById('resBox');
+        const tDisp = document.getElementById('tperiod');
+        const loadValDisp = document.getElementById('loadVal');
+        const loadTextDisp = document.getElementById('loadText');
+
+        if (!isNaN(cap) && !isNaN(ton) && !isNaN(flow) && flow > 0) {
+            let period = (cap * ton * 3600) / flow;
+            
+            if (period > 999.9) {
+                tDisp.innerText = "MAX";
+                resBox.classList.add('warning');
+            } else {
+                const load = (ton / period) * 100;
+                tDisp.innerText = period.toFixed(1);
+                loadValDisp.innerText = Math.round(load);
+                
+                if (load > 20) {
+                    resBox.classList.add('warning');
+                    loadTextDisp.innerText = "ПЕРЕГРЕВ!";
+                    loadTextDisp.style.color = "#ff3b30";
+                } else {
+                    resBox.classList.remove('warning');
+                    loadTextDisp.innerText = "БЕЗОПАСНО";
+                    loadTextDisp.style.color = "#28cd41";
+                }
+            }
+        } else {
+            tDisp.innerText = "0.0";
+            resBox.classList.remove('warning');
+        }
+    }
+
+    function resetAll() {
+        document.getElementById('cal_ml').value = '';
+        document.getElementById('cal_sec').value = '';
+        document.getElementById('cap').value = '';
+        document.getElementById('ton').value = '';
+        document.getElementById('flow').value = '';
+        document.getElementById('cal_res').innerText = '0.00';
+        document.getElementById('tperiod').innerText = '0.0';
+        document.getElementById('loadVal').innerText = '0';
+        document.getElementById('loadText').innerText = 'Безопасно';
+        document.getElementById('loadText').style.color = '#8e8e93';
+        document.getElementById('resBox').classList.remove('warning');
+    }
+    window.onload = resetAll;
+    </script>
+</body>
+</html>
