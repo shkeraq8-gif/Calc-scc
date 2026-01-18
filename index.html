@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>SSVC0059 Pro</title>
+    <title>SSVC0059 Pro - Инструкция</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; padding: 15px; background: #f2f2f7; color: #000; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 360px; margin: auto; margin-bottom: 15px; }
@@ -11,13 +11,11 @@
         .calib-section { background: #f9f9fb; border: 1px dashed #d1d1d6; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         label { display: block; margin-top: 10px; font-size: 11px; color: #8e8e93; text-transform: uppercase; margin-left: 5px; }
         input { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 18px; background: #fff; font-weight: bold; }
-        .res-main { margin-top: 20px; background: #28cd41; color: white; padding: 15px; border-radius: 12px; text-align: center; transition: 0.3s; }
+        .res-main { margin-top: 20px; background: #007aff; color: white; padding: 15px; border-radius: 12px; text-align: center; transition: 0.3s; }
         .warning { background: #ff3b30 !important; }
-        .res-val { font-size: 2.2em; font-weight: bold; display: block; }
+        .res-val { font-size: 2.5em; font-weight: bold; display: block; }
         .load-info { font-size: 12px; margin-top: 10px; text-align: center; color: #8e8e93; }
-        .btn-reset { width: 100%; margin-top: 15px; padding: 12px; background: #ff3b30; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: bold; }
-        .calib-res { color: #007aff; font-weight: bold; font-size: 1.1em; }
-        .hint { font-size: 10px; color: #aeaeb2; margin-top: 2px; margin-left: 5px; }
+        .btn-reset { width: 100%; margin-top: 15px; padding: 12px; background: #8e8e93; color: white; border: none; border-radius: 10px; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -34,28 +32,27 @@
             </p>
         </div>
 
-        <h3>2. РАСЧЕТ</h3>
+        <h3>2. РАСЧЕТ ПО ИНСТРУКЦИИ</h3>
         <label>Пропускная (мл/сек):</label>
         <input type="number" id="cap" placeholder="3.80" step="0.01" oninput="calc()">
         
-        <label>Время открытия клапана (сек):</label>
-        <input type="number" id="ton" placeholder="0.90" step="0.01" oninput="calc()">
-        <div class="hint">Точность до сотых (0.01)</div>
+        <label>Ton — ОТКРЫТО (сек):</label>
+        <input type="number" id="ton" placeholder="0.9" step="0.1" oninput="calc()">
         
         <label>Целевой отбор (мл/час):</label>
         <input type="number" id="flow" placeholder="1800" oninput="calc()">
 
         <div id="resBox" class="res-main">
-            <small id="resTitle">ВРЕМЯ ЗАКРЫТИЯ КЛАПАНА:</small>
-            <span id="tperiod" class="res-val">0.0</span>
-            <small>Точность до десятых (0.1)</small>
+            <small>ПАРАМЕТР Tperiod (ЦЕЛОЕ):</small>
+            <span id="tperiod" class="res-val">0</span>
+            <small>Введите это число в контроллер</small>
         </div>
 
         <div class="load-info">
-            Нагрузка: <span id="loadVal">0</span>% | <span id="loadText">Безопасно</span>
+            Цикл: <span id="loadVal">0</span>% времени открыт | <span id="loadText">OK</span>
         </div>
 
-        <button class="btn-reset" onclick="resetAll()">ОЧИСТИТЬ ВСЁ</button>
+        <button class="btn-reset" onclick="resetAll()">СБРОСИТЬ ДАННЫЕ</button>
     </div>
 
     <script>
@@ -80,47 +77,4 @@
         const loadValDisp = document.getElementById('loadVal');
         const loadTextDisp = document.getElementById('loadText');
 
-        if (!isNaN(cap) && !isNaN(ton) && !isNaN(flow) && flow > 0) {
-            let period = (cap * ton * 3600) / flow;
-            
-            if (period > 999.9) {
-                tDisp.innerText = "MAX";
-                resBox.classList.add('warning');
-            } else {
-                const load = (ton / period) * 100;
-                tDisp.innerText = period.toFixed(1);
-                loadValDisp.innerText = Math.round(load);
-                
-                if (load > 20) {
-                    resBox.classList.add('warning');
-                    loadTextDisp.innerText = "ПЕРЕГРЕВ!";
-                    loadTextDisp.style.color = "#ff3b30";
-                } else {
-                    resBox.classList.remove('warning');
-                    loadTextDisp.innerText = "БЕЗОПАСНО";
-                    loadTextDisp.style.color = "#28cd41";
-                }
-            }
-        } else {
-            tDisp.innerText = "0.0";
-            resBox.classList.remove('warning');
-        }
-    }
-
-    function resetAll() {
-        document.getElementById('cal_ml').value = '';
-        document.getElementById('cal_sec').value = '';
-        document.getElementById('cap').value = '';
-        document.getElementById('ton').value = '';
-        document.getElementById('flow').value = '';
-        document.getElementById('cal_res').innerText = '0.00';
-        document.getElementById('tperiod').innerText = '0.0';
-        document.getElementById('loadVal').innerText = '0';
-        document.getElementById('loadText').innerText = 'Безопасно';
-        document.getElementById('loadText').style.color = '#8e8e93';
-        document.getElementById('resBox').classList.remove('warning');
-    }
-    window.onload = resetAll;
-    </script>
-</body>
-</html>
+        if (!isNaN(cap) && !isNaN
