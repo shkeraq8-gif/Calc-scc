@@ -2,80 +2,118 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>SSVC0059 Pro - Инструкция</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SSVC0059 Calc</title>
     <style>
-        body { font-family: -apple-system, system-ui, sans-serif; padding: 15px; background: #f2f2f7; color: #000; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 360px; margin: auto; margin-bottom: 15px; }
-        h3 { text-align: center; margin: 0 0 15px 0; color: #007aff; font-size: 1.1em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .calib-section { background: #f9f9fb; border: 1px dashed #d1d1d6; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        label { display: block; margin-top: 10px; font-size: 11px; color: #8e8e93; text-transform: uppercase; margin-left: 5px; }
-        input { width: 100%; padding: 12px; margin-top: 4px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 18px; background: #fff; font-weight: bold; }
-        .res-main { margin-top: 20px; background: #007aff; color: white; padding: 15px; border-radius: 12px; text-align: center; transition: 0.3s; }
-        .warning { background: #ff3b30 !important; }
-        .res-val { font-size: 2.5em; font-weight: bold; display: block; }
-        .load-info { font-size: 12px; margin-top: 10px; text-align: center; color: #8e8e93; }
-        .btn-reset { width: 100%; margin-top: 15px; padding: 12px; background: #8e8e93; color: white; border: none; border-radius: 10px; font-size: 14px; }
+        body { font-family: sans-serif; padding: 15px; background: #f0f0f5; color: #1a1a1a; }
+        .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 350px; margin: auto; }
+        h3 { text-align: center; color: #007aff; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        label { display: block; font-size: 12px; color: #666; margin: 10px 0 4px 5px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; font-weight: bold; }
+        .result-box { margin-top: 20px; background: #007aff; color: #fff; padding: 20px; border-radius: 12px; text-align: center; }
+        .result-box.warning { background: #ff3b30; }
+        .res-val { font-size: 40px; font-weight: bold; display: block; }
+        .info { font-size: 12px; text-align: center; margin-top: 10px; color: #888; }
+        button { width: 100%; margin-top: 20px; padding: 12px; background: #eee; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h3>1. КАЛИБРОВКА</h3>
-        <div class="calib-section">
-            <label>Собрано мл:</label>
-            <input type="number" id="cal_ml" placeholder="380" oninput="runCalib()">
-            <label>Время замера (сек):</label>
-            <input type="number" id="cal_sec" placeholder="100" oninput="runCalib()">
-            <p style="font-size: 13px; margin-top: 12px; text-align: center;">
-                ПРОПУСКНАЯ: <span id="cal_res">0.00</span> мл/сек
-            </p>
-        </div>
-
-        <h3>2. РАСЧЕТ ПО ИНСТРУКЦИИ</h3>
-        <label>Пропускная (мл/сек):</label>
-        <input type="number" id="cap" placeholder="3.80" step="0.01" oninput="calc()">
-        
-        <label>Ton — ОТКРЫТО (сек):</label>
-        <input type="number" id="ton" placeholder="0.9" step="0.1" oninput="calc()">
-        
-        <label>Целевой отбор (мл/час):</label>
-        <input type="number" id="flow" placeholder="1800" oninput="calc()">
-
-        <div id="resBox" class="res-main">
-            <small>ПАРАМЕТР Tperiod (ЦЕЛОЕ):</small>
-            <span id="tperiod" class="res-val">0</span>
-            <small>Введите это число в контроллер</small>
-        </div>
-
-        <div class="load-info">
-            Цикл: <span id="loadVal">0</span>% времени открыт | <span id="loadText">OK</span>
-        </div>
-
-        <button class="btn-reset" onclick="resetAll()">СБРОСИТЬ ДАННЫЕ</button>
+<div class="card">
+    <h3>SSVC0059: РАСЧЕТ</h3>
+    
+    <div style="background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px dashed #ccc;">
+        <label>Калибровка (мл):</label>
+        <input type="number" id="v_ml" placeholder="380">
+        <label>Время замера (сек):</label>
+        <input type="number" id="v_sec" placeholder="100">
     </div>
 
-    <script>
-    function runCalib() {
-        const ml = parseFloat(document.getElementById('cal_ml').value);
-        const sec = parseFloat(document.getElementById('cal_sec').value);
-        if (!isNaN(ml) && !isNaN(sec) && sec > 0) {
-            const res = ml / sec;
-            document.getElementById('cal_res').innerText = res.toFixed(2);
-            document.getElementById('cap').value = res.toFixed(2);
-            calc();
-        }
-    }
+    <label>Ton - ОТКРЫТО (сек):</label>
+    <input type="number" id="ton" step="0.1" placeholder="0.9">
 
-    function calc() {
-        const cap = parseFloat(document.getElementById('cap').value);
+    <label>Отбор (мл/час):</label>
+    <input type="number" id="flow" placeholder="1800">
+
+    <div id="resBox" class="result-box">
+        <small>ПАРАМЕТР Tperiod:</small>
+        <span id="tperiod" class="res-val">0</span>
+        <small id="status">Введите данные</small>
+    </div>
+
+    <div class="info">
+        Нагрузка: <span id="load">0</span>%
+    </div>
+
+    <button onclick="location.reload()">СБРОС</button>
+</div>
+
+<script>
+    const inputs = ['v_ml', 'v_sec', 'ton', 'flow'];
+    
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+        // Обработка ввода
+        el.addEventListener('input', () => {
+            // Замена запятой на точку для мобильных
+            if (el.value.includes(',')) {
+                el.value = el.value.replace(',', '.');
+            }
+            calculate();
+        });
+    });
+
+    function calculate() {
+        const v_ml = parseFloat(document.getElementById('v_ml').value);
+        const v_sec = parseFloat(document.getElementById('v_sec').value);
         const ton = parseFloat(document.getElementById('ton').value);
         const flow = parseFloat(document.getElementById('flow').value);
         
         const resBox = document.getElementById('resBox');
         const tDisp = document.getElementById('tperiod');
-        const loadValDisp = document.getElementById('loadVal');
-        const loadTextDisp = document.getElementById('loadText');
+        const status = document.getElementById('status');
+        const loadDisp = document.getElementById('load');
 
-        if (!isNaN(cap) && !isNaN
+        if (v_ml > 0 && v_sec > 0 && ton > 0 && flow > 0) {
+            // 1. Пропускная способность мл/сек
+            const cap = v_ml / v_sec;
+            
+            // 2. Период (Tperiod) по формуле из инструкции
+            // Tperiod = (Cap * Ton * 3600) / Flow
+            let tperiod = (cap * ton * 3600) / flow;
+            let finalT = Math.round(tperiod);
 
+            // Проверки по инструкции
+            if (finalT < ton) {
+                tDisp.innerText = "!!!";
+                status.innerText = "Ошибка: Ton > Tperiod";
+                resBox.classList.add('warning');
+            } else if (finalT > 999) {
+                tDisp.innerText = "MAX";
+                status.innerText = "Предел 999 сек";
+                resBox.classList.add('warning');
+            } else {
+                tDisp.innerText = finalT;
+                status.innerText = "Установите это значение";
+                
+                // Расчет нагрузки
+                const load = Math.round((ton / finalT) * 100);
+                loadDisp.innerText = load;
+                
+                if (load > 20) {
+                    resBox.classList.add('warning');
+                } else {
+                    resBox.classList.remove('warning');
+                }
+            }
+        } else {
+            tDisp.innerText = "0";
+            status.innerText = "Ожидание данных...";
+            resBox.classList.remove('warning');
+            loadDisp.innerText = "0";
+        }
+    }
+</script>
+
+</body>
+</html>
