@@ -10,7 +10,7 @@
         .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 400px; margin: auto; }
         
         .tabs { display: flex; background: #e3e3e8; padding: 3px; border-radius: 10px; margin-bottom: 20px; overflow-x: auto; }
-        .tab-btn { flex: 1; border: none; padding: 8px 5px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; background: none; color: #8e8e93; white-space: nowrap; }
+        .tab-btn { flex: 1; border: none; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; background: none; color: #8e8e93; white-space: nowrap; }
         .tab-btn.active { background: #fff; color: var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .section { display: none; }
@@ -23,8 +23,12 @@
         .res-val { font-size: 38px; font-weight: bold; display: block; margin: 5px 0; }
         
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f8fa; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 13px; }
-        .power-card { background: #f0f9ff; border: 1px solid #bae6fd; padding: 15px; border-radius: 12px; text-align: center; margin-top: 10px; }
+        .calib-box { margin-top:15px; text-align:center; padding:15px; background: #eefbff; border: 1px solid #bae6fd; border-radius:12px; }
         .p-val { font-size: 28px; color: var(--blue); font-weight: bold; }
+        
+        table { width:100%; border-collapse:collapse; font-size:13px; margin-top: 10px; }
+        th { color:#888; text-align: left; padding: 8px; border-bottom:1px solid #eee; }
+        td { padding: 8px; border-bottom:1px solid #eee; height:35px; }
     </style>
 </head>
 <body>
@@ -45,44 +49,58 @@
         <label>Нужный отбор (мл/час)</label>
         <input type="number" id="flow" placeholder="1000" inputmode="numeric">
         <div id="resBox" class="result-box">
-            <small>ПАРАМЕТР Tperiod:</small>
+            <small>ПАРАМЕТР Tperiod ДЛЯ SSVC:</small>
             <span id="tperiod" class="res-val">0</span>
             <small id="status">Введите данные</small>
         </div>
     </div>
 
-    <div id="powerTab" class="section">
-        <label>Номинал ТЭНа (Вт при 220В)</label>
-        <input type="number" id="p_nom" placeholder="3000" value="3000" inputmode="numeric">
-        
-        <label>Текущее напряжение (Вольт)</label>
-        <input type="number" id="v_now" placeholder="220" inputmode="numeric">
-
-        <div class="power-card">
-            <small style="color:#666">РЕАЛЬНАЯ МОЩНОСТЬ:</small>
-            <div id="p_real" class="p-val">0 Вт</div>
-            <div id="p_diff" style="font-size:12px; margin-top:5px; color:#888"></div>
+    <div id="testTab" class="section">
+        <div style="background: #fffbe6; padding: 10px; border-radius: 8px; font-size: 11px; color: #856404; margin-bottom: 10px; border: 1px solid #ffeeba;">
+            Укажите настройки, которые были в приборе во время замера
         </div>
         
-        <p style="font-size: 11px; color: #999; margin-top: 15px; text-align: center;">
-            * Расчет по формуле: $P_{real} = P_{nom} \times (V_{now}^2 / 220^2)$
-        </p>
+        <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+                <label>Ton (был)</label>
+                <input type="number" id="test_ton_set" value="0.7" step="0.1" inputmode="decimal">
+            </div>
+            <div style="flex: 1;">
+                <label>Tp (был)</label>
+                <input type="number" id="test_tp_set" value="48" inputmode="numeric">
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 5px;">
+            <div style="flex: 1;">
+                <label>Собрано мл</label>
+                <input type="number" id="test_ml" placeholder="89" inputmode="decimal">
+            </div>
+            <div style="flex: 1;">
+                <label>За время (мин)</label>
+                <input type="number" id="test_min" placeholder="30" inputmode="decimal">
+            </div>
+        </div>
+
+        <div class="calib-box">
+            <small>ВЫЧИСЛЕННЫЙ CAP (МЛ/СЕК):</small>
+            <div id="new_cap_res" class="p-val">0.00</div>
+            <div id="new_flow_h" style="font-size: 12px; color: #666;">Поток: 0 мл/ч</div>
+        </div>
+        
+        <button style="width:100%; margin-top:15px; padding:12px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="applyNewCap()">ПРИМЕНИТЬ В КАЛЬКУЛЯТОР</button>
     </div>
 
-    <div id="testTab" class="section">
-        <label>Собрано мл</label>
-        <input type="number" id="test_ml" placeholder="89" inputmode="decimal">
-        <label>За время (мин)</label>
-        <input type="number" id="test_min" placeholder="30" inputmode="decimal">
-        <div class="info-grid">
-            <div>Ton: <b id="test_ton_val">0.7</b></div>
-            <div>Tp: <b id="test_tp_val">48</b></div>
+    <div id="powerTab" class="section">
+        <label>Номинал ТЭНа (Вт при 220В)</label>
+        <input type="number" id="p_nom" value="3000" inputmode="numeric">
+        <label>Текущее напряжение (Вольт)</label>
+        <input type="number" id="v_now" placeholder="220" inputmode="numeric">
+        <div class="result-box" style="background: var(--green);">
+            <small>РЕАЛЬНАЯ МОЩНОСТЬ:</small>
+            <div id="p_real" class="res-val">0 Вт</div>
+            <div id="p_diff" style="font-size:12px; opacity:0.8"></div>
         </div>
-        <div style="margin-top:15px; text-align:center; padding:15px; background:#f0f0f5; border-radius:12px;">
-            <small>НОВЫЙ CAP (МЛ/СЕК):</small>
-            <div id="new_cap_res" style="font-size:24px; font-weight:bold; color:var(--blue);">0.00</div>
-        </div>
-        <button style="width:100%; margin-top:10px; padding:12px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold;" onclick="applyNewCap()">ПРИМЕНИТЬ</button>
     </div>
 
     <div id="tableTab" class="section">
@@ -103,7 +121,47 @@
         if(tabName === 'tableTab') updateTable();
     }
 
-    // Расчет мощности
+    // Расчет отбора (Вкладка 1)
+    const calculate = () => {
+        const cap = parseFloat(el('cap').value) || 0;
+        const ton = parseFloat(el('ton').value) || 0;
+        const flow = parseFloat(el('flow').value) || 0;
+        if (cap > 0 && ton > 0 && flow > 0) {
+            let tp = Math.round((cap * ton * 3600) / flow);
+            el('tperiod').innerText = tp > 999 ? "999" : tp;
+            el('status').innerText = tp > 999 ? "Предел прибора" : "Установите в SSVC";
+        }
+    };
+    ['cap', 'ton', 'flow'].forEach(id => el(id).addEventListener('input', calculate));
+
+    // Логика замера (Вкладка 2)
+    const calcCalib = () => {
+        const ml = parseFloat(el('test_ml').value) || 0;
+        const min = parseFloat(el('test_min').value) || 0;
+        const t_ton = parseFloat(el('test_ton_set').value) || 0;
+        const t_tp = parseFloat(el('test_tp_set').value) || 0;
+
+        if (ml > 0 && min > 0 && t_ton > 0 && t_tp > 0) {
+            let realFlowPerHour = (ml / min) * 60;
+            let dutyCycle = t_ton / t_tp;
+            let cap = (realFlowPerHour / dutyCycle) / 3600;
+            
+            el('new_cap_res').innerText = cap.toFixed(2);
+            el('new_flow_h').innerText = "Факт. поток: " + Math.round(realFlowPerHour) + " мл/ч";
+        }
+    };
+    ['test_ml', 'test_min', 'test_ton_set', 'test_tp_set'].forEach(id => el(id).addEventListener('input', calcCalib));
+
+    function applyNewCap() {
+        const nCap = el('new_cap_res').innerText;
+        if (nCap !== "0.00") {
+            el('cap').value = nCap;
+            alert("Пропускная способность " + nCap + " мл/сек сохранена!");
+            calculate();
+        }
+    }
+
+    // Расчет мощности (Вкладка 3)
     const calcPower = () => {
         const pNom = parseFloat(el('p_nom').value) || 0;
         const vNow = parseFloat(el('v_now').value) || 0;
@@ -114,52 +172,16 @@
             el('p_diff').innerText = (diff >= 0 ? "+" : "") + diff + " Вт от номинала";
         }
     };
-    el('p_nom').addEventListener('input', calcPower);
-    el('v_now').addEventListener('input', calcPower);
-
-    // Весь остальной функционал (ОТБОР, ЗАМЕР)
-    const calculate = () => {
-        const cap = parseFloat(el('cap').value) || 0;
-        const ton = parseFloat(el('ton').value) || 0;
-        const flow = parseFloat(el('flow').value) || 0;
-        if (cap > 0 && ton > 0 && flow > 0) {
-            let tp = Math.round((cap * ton * 3600) / flow);
-            el('tperiod').innerText = tp > 999 ? "999" : tp;
-            el('status').innerText = tp > 999 ? "Предел" : "Tperiod для контроллера";
-            el('test_tp_val').innerText = tp;
-        }
-    };
-    ['cap', 'ton', 'flow'].forEach(id => el(id).addEventListener('input', calculate));
-
-    // Логика замера
-    const calcCalib = () => {
-        const ml = parseFloat(el('test_ml').value) || 0;
-        const min = parseFloat(el('test_min').value) || 0;
-        const ton = parseFloat(el('ton').value) || 0;
-        const tp = parseFloat(el('test_tp_val').innerText) || 0;
-        if (ml > 0 && min > 0 && tp > 0) {
-            let flowH = (ml / min) * 60;
-            let cap = (flowH / (ton / tp)) / 3600;
-            el('new_cap_res').innerText = cap.toFixed(2);
-        }
-    };
-    ['test_ml', 'test_min'].forEach(id => el(id).addEventListener('input', calcCalib));
-
-    function applyNewCap() {
-        el('cap').value = el('new_cap_res').innerText;
-        alert("ОК! Параметр Cap обновлен.");
-        calculate();
-    }
+    ['p_nom', 'v_now'].forEach(id => el(id).addEventListener('input', calcPower));
 
     function updateTable() {
         const cap = parseFloat(el('cap').value) || 0;
         const ton = parseFloat(el('ton').value) || 0;
-        let html = '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
-        html += '<tr style="color:#888; border-bottom:1px solid #eee"><th>Tp</th><th>Отбор л/ч</th><th>Загрузка</th></tr>';
-        [2, 5, 10, 20, 48, 100, 200].forEach(tp => {
+        let html = '<table><tr><th>Tp</th><th>Отбор л/ч</th><th>Загр.</th></tr>';
+        [5, 10, 15, 20, 30, 45, 60, 90, 120, 180].forEach(tp => {
             if (tp > ton) {
                 let f = ((ton / tp) * cap * 3600 / 1000).toFixed(2);
-                html += `<tr style="border-bottom:1px solid #eee; height:35px;"><td>${tp}с</td><td><b>${f} л</b></td><td>${Math.round(ton/tp*100)}%</td></tr>`;
+                html += `<tr><td>${tp}с</td><td><b>${f} л</b></td><td>${Math.round(ton/tp*100)}%</td></tr>`;
             }
         });
         el('tableData').innerHTML = html + '</table>';
