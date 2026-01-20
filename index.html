@@ -3,173 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SSVC0059 Expert Pro</title>
+    <title>SSVC0059 PRO</title>
     <style>
-        :root { --blue: #007aff; --red: #ff3b30; --green: #34c759; --bg: #f2f2f7; --card: #ffffff; }
-        body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: #1c1c1e; line-height: 1.4; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 400px; margin: auto; }
+        :root { --blue: #007aff; --red: #ff3b30; --green: #34c759; --bg: #f2f2f7; --card: #ffffff; --grey: #8e8e93; }
+        body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: #1c1c1e; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 380px; margin: auto; }
         
-        .tabs { display: flex; background: #e3e3e8; padding: 3px; border-radius: 10px; margin-bottom: 20px; overflow-x: auto; }
-        .tab-btn { flex: 1; border: none; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; background: none; color: #8e8e93; white-space: nowrap; }
+        /* Исправленная навигация */
+        .tabs { display: flex; background: #e3e3e8; padding: 3px; border-radius: 10px; margin-bottom: 20px; gap: 2px; }
+        .tab-btn { flex: 1; border: none; padding: 10px 2px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; background: none; color: var(--grey); text-transform: uppercase; }
         .tab-btn.active { background: #fff; color: var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .section { display: none; }
         .section.active { display: block; }
 
-        label { display: block; font-size: 10px; color: #8e8e93; margin: 12px 0 4px 5px; text-transform: uppercase; font-weight: bold; }
-        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 16px; font-weight: 600; background: #fff; }
+        label { display: block; font-size: 10px; color: var(--grey); margin: 12px 0 4px 5px; text-transform: uppercase; font-weight: bold; }
+        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 16px; font-weight: 600; }
         
-        .result-box { margin-top: 20px; background: #d1d1d6; color: #fff; padding: 15px; border-radius: 12px; text-align: center; transition: 0.3s; }
+        .result-box { margin-top: 15px; background: #d1d1d6; color: #fff; padding: 15px; border-radius: 12px; text-align: center; }
         .result-box.active { background: var(--blue); }
-        .res-val { font-size: 38px; font-weight: bold; display: block; margin: 5px 0; }
+        .res-val { font-size: 36px; font-weight: bold; display: block; line-height: 1.2; }
         
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f8fa; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 13px; }
         .calib-box { margin-top:15px; text-align:center; padding:15px; background: #f8f8fa; border: 1px solid #eee; border-radius:12px; }
-        .p-val { font-size: 28px; color: var(--blue); font-weight: bold; }
-        
-        table { width:100%; border-collapse:collapse; font-size:13px; margin-top: 10px; }
-        th { color:#888; text-align: left; padding: 8px; border-bottom:1px solid #eee; }
-        td { padding: 8px; border-bottom:1px solid #eee; height:35px; }
-        .empty-msg { text-align: center; color: #8e8e93; padding: 40px 20px; font-size: 13px; }
+        table { width:100%; border-collapse:collapse; font-size: 13px; margin-top: 10px; }
+        td, th { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        .btn-apply { width:100%; margin-top:15px; padding:14px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'calcTab')">ОТБОР</button>
-        <button class="tab-btn" onclick="openTab(event, 'testTab')">ЗАМЕР</button>
-        <button class="tab-btn" onclick="openTab(event, 'powerTab')">МОЩНОСТЬ</button>
-        <button class="tab-btn" onclick="openTab(event, 'tableTab')">ТАБЛИЦА</button>
+        <button class="tab-btn active" onclick="openTab(this, 'calcTab')">Отбор</button>
+        <button class="tab-btn" onclick="openTab(this, 'testTab')">Замер</button>
+        <button class="tab-btn" onclick="openTab(this, 'powerTab')">ТЭН</button>
+        <button class="tab-btn" onclick="openTab(this, 'tableTab')">Таблица</button>
     </div>
 
     <div id="calcTab" class="section active">
         <label>Пропускная (мл/сек)</label>
-        <input type="number" id="cap" step="0.01" placeholder="Напр: 3.39" inputmode="decimal">
+        <input type="number" id="cap" step="0.01" placeholder="Напр: 3.39" inputmode="decimal" oninput="calculate()">
         <label>Ton - ОТКРЫТО (сек)</label>
-        <input type="number" id="ton" step="0.1" placeholder="Напр: 0.7" inputmode="decimal">
+        <input type="number" id="ton" step="0.1" placeholder="Напр: 0.7" inputmode="decimal" oninput="calculate()">
         <label>Нужный отбор (мл/час)</label>
-        <input type="number" id="flow" placeholder="Напр: 1000" inputmode="numeric">
+        <input type="number" id="flow" placeholder="Напр: 1000" inputmode="numeric" oninput="calculate()">
+        
         <div id="resBox" class="result-box">
-            <small>ПАРАМЕТР Tperiod ДЛЯ SSVC:</small>
+            <small>Tperiod ДЛЯ SSVC:</small>
             <span id="tperiod" class="res-val">0</span>
-            <small id="status">Ожидание данных...</small>
+            <small id="status">Заполните поля выше</small>
         </div>
     </div>
 
     <div id="testTab" class="section">
-        <div style="display: flex; gap: 10px;">
-            <div style="flex: 1;">
-                <label>Ton (был)</label>
-                <input type="number" id="test_ton_set" placeholder="0.7" inputmode="decimal">
-            </div>
-            <div style="flex: 1;">
-                <label>Tp (был)</label>
-                <input type="number" id="test_tp_set" placeholder="48" inputmode="numeric">
-            </div>
+        <div style="display: flex; gap: 8px;">
+            <div style="flex: 1;"><label>Ton (был)</label><input type="number" id="t_ton" placeholder="0.7" oninput="runCalib()"></div>
+            <div style="flex: 1;"><label>Tp (был)</label><input type="number" id="t_tp" placeholder="48" oninput="runCalib()"></div>
         </div>
-        <div style="display: flex; gap: 10px; margin-top: 5px;">
-            <div style="flex: 1;">
-                <label>Собрано мл</label>
-                <input type="number" id="test_ml" placeholder="89" inputmode="decimal">
-            </div>
-            <div style="flex: 1;">
-                <label>За время (мин)</label>
-                <input type="number" id="test_min" placeholder="30" inputmode="decimal">
-            </div>
+        <div style="display: flex; gap: 8px;">
+            <div style="flex: 1;"><label>Мл собрано</label><input type="number" id="t_ml" placeholder="89" oninput="runCalib()"></div>
+            <div style="flex: 1;"><label>Мин замера</label><input type="number" id="t_min" placeholder="30" oninput="runCalib()"></div>
         </div>
         <div class="calib-box">
-            <small>ВЫЧИСЛЕННЫЙ CAP (МЛ/СЕК):</small>
-            <div id="new_cap_res" class="p-val">0.00</div>
-            <div id="new_flow_h" style="font-size: 12px; color: #666;">Введите данные замера</div>
+            <small>ВЫЧИСЛЕННЫЙ CAP:</small>
+            <div id="res_cap" style="font-size:24px; font-weight:bold; color:var(--blue)">0.00</div>
         </div>
-        <button style="width:100%; margin-top:15px; padding:12px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer;" onclick="applyNewCap()">ПРИМЕНИТЬ В КАЛЬКУЛЯТОР</button>
+        <button class="btn-apply" onclick="applyCap()">Применить настройки</button>
     </div>
 
     <div id="powerTab" class="section">
         <label>Номинал ТЭНа (Вт при 220В)</label>
-        <input type="number" id="p_nom" placeholder="Напр: 3000" inputmode="numeric">
-        <label>Текущее напряжение (Вольт)</label>
-        <input type="number" id="v_now" placeholder="Напр: 225" inputmode="numeric">
-        <div id="pBox" class="result-box">
-            <small>РЕАЛЬНАЯ МОЩНОСТЬ:</small>
-            <div id="p_real" class="res-val">0 Вт</div>
-            <div id="p_diff" style="font-size:12px; opacity:0.8">Ожидание вольтажа</div>
-        </div>
-    </div>
-
-    <div id="tableTab" class="section">
-        <div id="tableData">
-            <div class="empty-msg">Заполните "Пропускную" и "Ton" в первой вкладке, чтобы увидеть таблицу</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const el = (id) => document.getElementById(id);
-
-    function openTab(evt, tabName) {
-        let contents = document.getElementsByClassName("section");
-        for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
-        let buttons = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
-        el(tabName).classList.add("active");
-        evt.currentTarget.classList.add("active");
-        if(tabName === 'tableTab') updateTable();
-    }
-
-    // Расчет отбора
-    const calculate = () => {
-        const cap = parseFloat(el('cap').value);
-        const ton = parseFloat(el('ton').value);
-        const flow = parseFloat(el('flow').value);
-        
-        if (cap > 0 && ton > 0 && flow > 0) {
-            let tp = Math.round((cap * ton * 3600) / flow);
-            el('tperiod').innerText = tp > 999 ? "999" : tp;
-            el('status').innerText = "Установите в SSVC";
-            el('resBox').classList.add('active');
-        } else {
-            el('tperiod').innerText = "0";
-            el('status').innerText = "Ожидание данных...";
-            el('resBox').classList.remove('active');
-        }
-    };
-    ['cap', 'ton', 'flow'].forEach(id => el(id).addEventListener('input', calculate));
-
-    // Логика замера
-    const calcCalib = () => {
-        const ml = parseFloat(el('test_ml').value);
-        const min = parseFloat(el('test_min').value);
-        const t_ton = parseFloat(el('test_ton_set').value);
-        const t_tp = parseFloat(el('test_tp_set').value);
-
-        if (ml > 0 && min > 0 && t_ton > 0 && t_tp > 0) {
-            let realFlowPerHour = (ml / min) * 60;
-            let dutyCycle = t_ton / t_tp;
-            let cap = (realFlowPerHour / dutyCycle) / 3600;
-            el('new_cap_res').innerText = cap.toFixed(2);
-            el('new_flow_h').innerText = "Факт. поток: " + Math.round(realFlowPerHour) + " мл/ч";
-        }
-    };
-    ['test_ml', 'test_min', 'test_ton_set', 'test_tp_set'].forEach(id => el(id).addEventListener('input', calcCalib));
-
-    function applyNewCap() {
-        const nCap = el('new_cap_res').innerText;
-        if (nCap !== "0.00") {
-            el('cap').value = nCap;
-            alert("Коэффициент " + nCap + " применен!");
-            calculate();
-        }
-    }
-
-    // Расчет мощности
-    const calcPower = () => {
-        const pNom = parseFloat(el('p_nom').value);
-        const vNow = parseFloat(el('v_now').value);
-        if (pNom > 0 && vNow > 0) {
-            const pReal = Math.round(pNom * (Math.pow(vNow, 2) / Math.pow(220, 2)));
-            el('p_real').innerText = pReal + " Вт";
-            const diff = pReal - pNom;
-            el('p_diff').innerText = (diff >= 0 ? "+" : "") + diff + " Вт от номинала";
-            el('pBox').style.background = "var(--green)";
+        <input type="number" id="p_nom" placeholder="3000
