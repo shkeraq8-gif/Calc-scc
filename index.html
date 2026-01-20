@@ -1,76 +1,156 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SSVC0059 PRO</title>
+    <title>SSVC0059 Config</title>
     <style>
-        :root { --blue: #007aff; --red: #ff3b30; --green: #34c759; --bg: #f2f2f7; --card: #ffffff; --grey: #8e8e93; }
-        body { font-family: -apple-system, sans-serif; padding: 10px; background: var(--bg); color: #1c1c1e; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 380px; margin: auto; }
-        
-        /* Исправленная навигация */
-        .tabs { display: flex; background: #e3e3e8; padding: 3px; border-radius: 10px; margin-bottom: 20px; gap: 2px; }
-        .tab-btn { flex: 1; border: none; padding: 10px 2px; border-radius: 8px; font-size: 10px; font-weight: bold; cursor: pointer; background: none; color: var(--grey); text-transform: uppercase; }
-        .tab-btn.active { background: #fff; color: var(--blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
+        body { font-family: sans-serif; background: #f0f0f5; padding: 10px; margin: 0; }
+        .card { background: #fff; max-width: 360px; margin: 10px auto; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; cursor: pointer; color: #888; font-weight: bold; font-size: 12px; }
+        .tab-btn.active { color: #007aff; border-bottom: 2px solid #007aff; }
         .section { display: none; }
         .section.active { display: block; }
-
-        label { display: block; font-size: 10px; color: var(--grey); margin: 12px 0 4px 5px; text-transform: uppercase; font-weight: bold; }
-        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; box-sizing: border-box; font-size: 16px; font-weight: 600; }
-        
-        .result-box { margin-top: 15px; background: #d1d1d6; color: #fff; padding: 15px; border-radius: 12px; text-align: center; }
-        .result-box.active { background: var(--blue); }
-        .res-val { font-size: 36px; font-weight: bold; display: block; line-height: 1.2; }
-        
-        .calib-box { margin-top:15px; text-align:center; padding:15px; background: #f8f8fa; border: 1px solid #eee; border-radius:12px; }
-        table { width:100%; border-collapse:collapse; font-size: 13px; margin-top: 10px; }
-        td, th { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        .btn-apply { width:100%; margin-top:15px; padding:14px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
+        label { display: block; font-size: 11px; color: #666; margin: 10px 0 5px; text-transform: uppercase; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; margin-bottom: 5px; }
+        .res-box { background: #eee; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; transition: 0.3s; }
+        .res-val { font-size: 32px; font-weight: bold; display: block; color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        td, th { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+        button { width: 100%; padding: 12px; background: #007aff; color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab(this, 'calcTab')">Отбор</button>
-        <button class="tab-btn" onclick="openTab(this, 'testTab')">Замер</button>
-        <button class="tab-btn" onclick="openTab(this, 'powerTab')">ТЭН</button>
-        <button class="tab-btn" onclick="openTab(this, 'tableTab')">Таблица</button>
+        <button id="b1" class="tab-btn active" onclick="showTab('t1')">ОТБОР</button>
+        <button id="b2" class="tab-btn" onclick="showTab('t2')">ЗАМЕР</button>
+        <button id="b3" class="tab-btn" onclick="showTab('t3')">ТЭН</button>
+        <button id="b4" class="tab-btn" onclick="showTab('t4')">ТАБЛИЦА</button>
     </div>
 
-    <div id="calcTab" class="section active">
+    <div id="t1" class="section active">
         <label>Пропускная (мл/сек)</label>
-        <input type="number" id="cap" step="0.01" placeholder="Напр: 3.39" inputmode="decimal" oninput="calculate()">
-        <label>Ton - ОТКРЫТО (сек)</label>
-        <input type="number" id="ton" step="0.1" placeholder="Напр: 0.7" inputmode="decimal" oninput="calculate()">
-        <label>Нужный отбор (мл/час)</label>
-        <input type="number" id="flow" placeholder="Напр: 1000" inputmode="numeric" oninput="calculate()">
-        
-        <div id="resBox" class="result-box">
-            <small>Tperiod ДЛЯ SSVC:</small>
-            <span id="tperiod" class="res-val">0</span>
-            <small id="status">Заполните поля выше</small>
+        <input type="number" id="c_cap" step="0.01" placeholder="3.39" oninput="doCalc()">
+        <label>Ton (сек)</label>
+        <input type="number" id="c_ton" step="0.1" placeholder="0.7" oninput="doCalc()">
+        <label>Цель (мл/час)</label>
+        <input type="number" id="c_flow" placeholder="1000" oninput="doCalc()">
+        <div id="out_box" class="res-box">
+            <small>Tperiod для SSVC:</small>
+            <span id="out_tp" class="res-val">0</span>
         </div>
     </div>
 
-    <div id="testTab" class="section">
-        <div style="display: flex; gap: 8px;">
-            <div style="flex: 1;"><label>Ton (был)</label><input type="number" id="t_ton" placeholder="0.7" oninput="runCalib()"></div>
-            <div style="flex: 1;"><label>Tp (был)</label><input type="number" id="t_tp" placeholder="48" oninput="runCalib()"></div>
+    <div id="t2" class="section">
+        <div style="display:flex; gap:5px;">
+            <div style="flex:1"><label>Ton был</label><input type="number" id="z_ton" oninput="doZamer()"></div>
+            <div style="flex:1"><label>Tp был</label><input type="number" id="z_tp" oninput="doZamer()"></div>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <div style="flex: 1;"><label>Мл собрано</label><input type="number" id="t_ml" placeholder="89" oninput="runCalib()"></div>
-            <div style="flex: 1;"><label>Мин замера</label><input type="number" id="t_min" placeholder="30" oninput="runCalib()"></div>
+        <div style="display:flex; gap:5px;">
+            <div style="flex:1"><label>Мл собрано</label><input type="number" id="z_ml" oninput="doZamer()"></div>
+            <div style="flex:1"><label>Мин замера</label><input type="number" id="z_min" oninput="doZamer()"></div>
         </div>
-        <div class="calib-box">
-            <small>ВЫЧИСЛЕННЫЙ CAP:</small>
-            <div id="res_cap" style="font-size:24px; font-weight:bold; color:var(--blue)">0.00</div>
+        <div class="res-box" style="background:#f9f9f9">
+            <small>НОВЫЙ CAP:</small>
+            <div id="z_res" style="font-size:24px; font-weight:bold; color:#007aff">0.00</div>
         </div>
-        <button class="btn-apply" onclick="applyCap()">Применить настройки</button>
+        <button onclick="applyZamer()">Применить в калькулятор</button>
     </div>
 
-    <div id="powerTab" class="section">
-        <label>Номинал ТЭНа (Вт при 220В)</label>
-        <input type="number" id="p_nom" placeholder="3000
+    <div id="t3" class="section">
+        <label>ТЭН номинал (Вт)</label>
+        <input type="number" id="p_n" placeholder="3000" oninput="doPower()">
+        <label>Вольт в сети</label>
+        <input type="number" id="p_v" placeholder="220" oninput="doPower()">
+        <div class="res-box" id="p_box">
+            <small>РЕАЛЬНЫЕ ВАТТЫ:</small>
+            <span id="p_res" class="res-val">0 Вт</span>
+        </div>
+    </div>
+
+    <div id="t4" class="section">
+        <div id="tbl_out"></div>
+    </div>
+</div>
+
+<script>
+    function showTab(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        if(id === 't4') makeTable();
+    }
+
+    function doCalc() {
+        let cp = parseFloat(document.getElementById('c_cap').value);
+        let tn = parseFloat(document.getElementById('c_ton').value);
+        let fl = parseFloat(document.getElementById('c_flow').value);
+        let box = document.getElementById('out_box');
+        if(cp > 0 && tn > 0 && fl > 0) {
+            let res = Math.round((cp * tn * 3600) / fl);
+            document.getElementById('out_tp').innerText = res > 999 ? "999" : res;
+            box.style.background = "#007aff"; box.style.color = "#fff";
+        } else {
+            document.getElementById('out_tp').innerText = "0";
+            box.style.background = "#eee"; box.style.color = "#333";
+        }
+    }
+
+    function doZamer() {
+        let ml = parseFloat(document.getElementById('z_ml').value);
+        let mn = parseFloat(document.getElementById('z_min').value);
+        let tn = parseFloat(document.getElementById('z_ton').value);
+        let tp = parseFloat(document.getElementById('z_tp').value);
+        if(ml > 0 && mn > 0 && tn > 0 && tp > 0) {
+            let cap = ((ml / mn) * 60 / (tn / tp)) / 3600;
+            document.getElementById('z_res').innerText = cap.toFixed(2);
+        }
+    }
+
+    function applyZamer() {
+        let val = document.getElementById('z_res').innerText;
+        if(val !== "0.00") {
+            document.getElementById('c_cap').value = val;
+            alert("Cap " + val + " скопирован!");
+            doCalc();
+            showTab('t1');
+            document.getElementById('b1').classList.add('active');
+            document.getElementById('b2').classList.remove('active');
+        }
+    }
+
+    function doPower() {
+        let pn = parseFloat(document.getElementById('p_n').value);
+        let pv = parseFloat(document.getElementById('p_v').value);
+        if(pn > 0 && pv > 0) {
+            let pr = Math.round(pn * (pv * pv) / 48400);
+            document.getElementById('p_res').innerText = pr + " Вт";
+            document.getElementById('p_box').style.background = "#34c759";
+            document.getElementById('p_box').style.color = "#fff";
+        }
+    }
+
+    function makeTable() {
+        let cp = parseFloat(document.getElementById('c_cap').value);
+        let tn = parseFloat(document.getElementById('c_ton').value);
+        let div = document.getElementById('tbl_out');
+        if(cp > 0 && tn > 0) {
+            let h = '<table><tr><th>Tp</th><th>Л/час</th><th>%</th></tr>';
+            [10, 20, 30, 45, 60, 90, 120, 180, 240, 300].forEach(tp => {
+                if(tp > tn) {
+                    let f = ((tn / tp) * cp * 3.6).toFixed(2);
+                    h += `<tr><td>${tp}с</td><td><b>${f}</b></td><td>${Math.round(tn/tp*100)}%</td></tr>`;
+                }
+            });
+            div.innerHTML = h + '</table>';
+        } else {
+            div.innerHTML = '<p style="text-align:center; color:#888; padding:20px;">Сначала введите данные в ОТБОР</p>';
+        }
+    }
+</script>
+</body>
+</html>
