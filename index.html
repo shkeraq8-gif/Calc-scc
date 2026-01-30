@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SSVC0059 Config v2.2</title>
+    <title>SSVC0059 Config v2.3</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f2f2f7; padding: 10px; margin: 0; color: #1c1c1e; }
         .card { background: #fff; max-width: 400px; margin: 10px auto; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
@@ -58,19 +58,20 @@
     </div>
 
     <div id="t2" class="section">
-        <div class="row">
-            <div class="col"><label>Ton был (сек)</label><input type="text" inputmode="decimal" id="z_ton" oninput="doZamer()"></div>
-            <div class="col"><label>Tp был (сек)</label><input type="text" inputmode="decimal" id="z_tp" oninput="doZamer()"></div>
-        </div>
-        <div class="row">
-            <div class="col"><label>Собрано (мл)</label><input type="text" inputmode="decimal" id="z_ml" oninput="doZamer()"></div>
-            <div class="col"><label>Минут замера</label><input type="text" inputmode="decimal" id="z_min" oninput="doZamer()"></div>
-        </div>
+        <label>Сколько собрано (мл)</label>
+        <input type="text" inputmode="decimal" id="z_ml" placeholder="50" oninput="doZamer()">
+        
+        <label>За сколько времени (минут)</label>
+        <input type="text" inputmode="decimal" id="z_min" placeholder="1" oninput="doZamer()">
+        
         <div class="res-box">
-            <small>РЕАЛЬНЫЙ CAP (МЛ/СЕК):</small>
+            <small>ПРОПУСКНАЯ (МЛ/СЕК):</small>
             <div id="z_res" class="res-val" style="color:#007aff">0.00</div>
         </div>
-        <button class="action-btn" onclick="applyZamer()">Применить результат</button>
+        <p style="font-size: 11px; color: #8e8e93; margin-top: 10px; text-align: center;">
+            * Замеряйте при 100% открытом клапане
+        </p>
+        <button class="action-btn" onclick="applyZamer()">Применить как Cap</button>
     </div>
 
     <div id="t3" class="section">
@@ -90,7 +91,6 @@
 </div>
 
 <script>
-    // Универсальная функция получения числа
     function getNum(id) {
         var el = document.getElementById(id);
         if(!el || !el.value) return 0;
@@ -107,7 +107,7 @@
     }
 
     function save() {
-        const ids = ['c_cap', 'c_ton', 'c_flow', 'p_n', 'z_ton', 'z_tp'];
+        const ids = ['c_cap', 'c_ton', 'c_flow', 'p_n'];
         ids.forEach(id => {
             var el = document.getElementById(id);
             if(el) localStorage.setItem('ssvc_' + id, el.value);
@@ -115,7 +115,7 @@
     }
 
     function loadData() {
-        const ids = ['c_cap', 'c_ton', 'c_flow', 'p_n', 'z_ton', 'z_tp'];
+        const ids = ['c_cap', 'c_ton', 'c_flow', 'p_n'];
         ids.forEach(id => {
             var v = localStorage.getItem('ssvc_' + id);
             if(v) document.getElementById(id).value = v;
@@ -127,33 +127,26 @@
         var tn = getNum('c_ton');
         var fl = getNum('c_flow');
         var box = document.getElementById('out_box');
-        
         save();
-
         if(cp > 0 && tn > 0 && fl > 0) {
             var res = Math.round((cp * tn * 3600) / fl);
             document.getElementById('out_tp').innerText = res > 999 ? "999+" : res;
-            box.style.background = "#007aff"; 
-            box.style.color = "#fff";
+            box.style.background = "#007aff"; box.style.color = "#fff";
         } else {
             document.getElementById('out_tp').innerText = "—";
-            box.style.background = "#f2f2f7"; 
-            box.style.color = "#1c1c1e";
+            box.style.background = "#f2f2f7"; box.style.color = "#1c1c1e";
         }
     }
 
+    // НОВАЯ УПРОЩЕННАЯ ФУНКЦИЯ ЗАМЕРА
     function doZamer() {
-        var ton = getNum('z_ton');
-        var tp = getNum('z_tp');
         var ml = getNum('z_ml');
         var min = getNum('z_min');
 
-        if (ton > 0 && tp > 0 && min > 0 && ml > 0) {
-            var flow_min = ml / min; 
-            var duty = ton / tp;
-            var cap = (flow_min / duty) / 60;
+        if (ml > 0 && min > 0) {
+            // Расчет: Объем / (Минуты * 60 секунд)
+            var cap = ml / (min * 60);
             document.getElementById('z_res').innerText = cap.toFixed(2);
-            save();
         } else {
             document.getElementById('z_res').innerText = "0.00";
         }
@@ -172,7 +165,6 @@
         var pn = getNum('p_n');
         var pv = getNum('p_v');
         save();
-
         if(pn > 0 && pv > 0) {
             var pr = Math.round(pn * Math.pow(pv / 220, 2));
             document.getElementById('p_res').innerText = pr + " Вт";
@@ -189,10 +181,9 @@
         var cp = getNum('c_cap');
         var tn = getNum('c_ton');
         var div = document.getElementById('tbl_out');
-        
         if(cp > 0 && tn > 0) {
-            var h = '<table><tr><th>Tp (сек)</th><th>Отбор л/час</th><th>%</th></tr>';
-            [10, 15, 20, 30, 40, 50, 60, 80, 100, 120, 180, 300, 600].forEach(function(tp) {
+            var h = '<table><tr><th>Tp (сек)</th><th>Л/час</th><th>%</th></tr>';
+            [10, 20, 30, 40, 50, 60, 90, 120, 180, 300, 600].forEach(function(tp) {
                 if(tp >= tn) {
                     var flow = ((tn / tp) * cp * 3.6).toFixed(2);
                     var perc = Math.round((tn/tp)*100);
@@ -205,11 +196,7 @@
         }
     }
 
-    window.onload = function() {
-        loadData();
-        doCalc();
-        doPower();
-    };
+    window.onload = function() { loadData(); doCalc(); doPower(); };
 </script>
 </body>
 </html>
