@@ -3,42 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SSVC Config Pro</title>
+    <title>SSVC Config Pro (Int)</title>
     <style>
-        :root { --primary: #007aff; --bg: #f2f2f7; --card: #fff; --text: #000; --input-bg: #fff; }
+        :root { --primary: #007aff; --bg: #f2f2f7; --card: #fff; --text: #000; --input-bg: #fff; --danger: #ff3b30; --success: #34c759; }
         @media (prefers-color-scheme: dark) {
-            :root { --primary: #0a84ff; --bg: #000; --card: #1c1c1e; --text: #fff; --input-bg: #2c2c2e; }
+            :root { --primary: #0a84ff; --bg: #000; --card: #1c1c1e; --text: #fff; --input-bg: #2c2c2e; --danger: #ff453a; --success: #32d74b; }
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 10px; margin: 0; transition: 0.3s; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
         .card { background: var(--card); max-width: 400px; margin: 10px auto; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         
         /* Tabs */
         .tabs { display: flex; margin-bottom: 20px; background: rgba(118, 118, 128, 0.12); border-radius: 8px; padding: 2px; }
-        .tab-btn { flex: 1; padding: 8px; border: none; background: none; cursor: pointer; color: var(--text); font-size: 13px; font-weight: 500; border-radius: 6px; opacity: 0.6; transition: 0.2s; }
-        .tab-btn.active { background: var(--card); opacity: 1; box-shadow: 0 3px 8px rgba(0,0,0,0.12); color: var(--text); }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: none; cursor: pointer; color: var(--text); font-size: 13px; font-weight: 500; border-radius: 6px; opacity: 0.6; }
+        .tab-btn.active { background: var(--card); opacity: 1; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
         
-        /* Content */
-        .section { display: none; animation: fadeIn 0.2s; }
+        .section { display: none; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Inputs */
         label { display: block; font-size: 12px; color: #8e8e93; margin: 12px 0 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid rgba(128,128,128, 0.2); color: var(--text); border-radius: 10px; box-sizing: border-box; font-size: 17px; margin-bottom: 5px; outline: none; }
+        input { width: 100%; padding: 12px; background: var(--input-bg); border: 1px solid rgba(128,128,128, 0.2); color: var(--text); border-radius: 10px; font-size: 17px; margin-bottom: 5px; outline: none; }
         input:focus { border-color: var(--primary); }
 
         /* Results */
         .res-box { background: rgba(118, 118, 128, 0.12); padding: 15px; border-radius: 12px; text-align: center; margin-top: 20px; }
-        .res-val { font-size: 36px; font-weight: 700; display: block; margin-top: 5px; font-variant-numeric: tabular-nums; }
+        .res-val { font-size: 42px; font-weight: 800; display: block; margin-top: 5px; color: var(--primary); }
         
-        /* Buttons */
-        button.action-btn { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 15px; active: opacity: 0.8; }
-
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
-        td, th { padding: 10px; border-bottom: 1px solid rgba(128,128,128, 0.2); text-align: left; }
-        th { color: #8e8e93; font-size: 12px; text-transform: uppercase; }
-        tr.highlight { background: rgba(0, 122, 255, 0.15); border-radius: 8px; }
+        .real-flow-box { margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(128,128,128, 0.2); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .flow-val { font-weight: bold; font-size: 16px; }
+        
+        button.action-btn { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        td, th { padding: 8px; border-bottom: 1px solid rgba(128,128,128, 0.2); text-align: left; }
     </style>
 </head>
 <body>
@@ -46,9 +43,8 @@
 <div class="card">
     <div class="tabs">
         <button id="b1" class="tab-btn active" onclick="showTab('t1')">ОТБОР</button>
-        <button id="b2" class="tab-btn" onclick="showTab('t2')">КАЛИБР</button>
-        <button id="b3" class="tab-btn" onclick="showTab('t3')">ТЭН</button>
-        <button id="b4" class="tab-btn" onclick="showTab('t4')">СПРАВКА</button>
+        <button id="b2" class="tab-btn" onclick="showTab('t2')">ЗАМЕР</button>
+        <button id="b3" class="tab-btn" onclick="showTab('t3')">ТАБЛИЦА</button>
     </div>
 
     <div id="t1" class="section active">
@@ -66,10 +62,17 @@
             </div>
         </div>
 
-        <div id="out_box" class="res-box">
-            <small>ВВЕДИ В SSVC (Tperiod):</small>
-            <span id="out_tp" class="res-val" style="color:var(--primary)">0.0</span>
-            <small id="real_flow_info" style="display:block; margin-top:5px; opacity:0.7"></small>
+        <div class="res-box">
+            <small>SSVC ПЕРИОД (Целое число):</small>
+            <span id="out_tp" class="res-val">0</span>
+            
+            <div class="real-flow-box">
+                <span style="color:#8e8e93">Фактический отбор:</span>
+                <span id="real_flow_val" class="flow-val">0 мл/ч</span>
+            </div>
+             <div id="diff_warning" style="font-size:11px; color:var(--danger); display:none; margin-top:5px;">
+                Отклонение от цели > 5%! Измените Ton.
+            </div>
         </div>
     </div>
 
@@ -84,123 +87,101 @@
         </div>
         
         <div class="res-box">
-            <small>РЕАЛЬНАЯ ПРОПУСКНАЯ:</small>
-            <div id="z_res" class="res-val">0.00</div>
+            <small>РЕАЛЬНЫЙ CAP:</small>
+            <div id="z_res" class="res-val" style="font-size:32px;">0.00</div>
             <small>мл/сек</small>
         </div>
-        <button class="action-btn" onclick="applyZamer()">Применить и сохранить</button>
+        <button class="action-btn" onclick="applyZamer()">Применить</button>
     </div>
 
     <div id="t3" class="section">
-        <label>Мощность ТЭНа по паспорту (Вт)</label>
-        <input type="number" inputmode="decimal" id="p_n" placeholder="3000" oninput="doPower()">
-        
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1">
-                <label>Вольт паспорт</label>
-                <input type="number" inputmode="decimal" id="p_v_rate" value="220" oninput="doPower()">
-            </div>
-            <div style="flex:1">
-                <label>Вольт в розетке</label>
-                <input type="number" inputmode="decimal" id="p_v_act" placeholder="215" oninput="doPower()">
-            </div>
-        </div>
-
-        <div class="res-box" id="p_box">
-            <small>ФАКТИЧЕСКАЯ МОЩНОСТЬ:</small>
-            <span id="p_res" class="res-val" style="color:#34c759">0</span>
-            <small>Ватт</small>
-        </div>
-    </div>
-
-    <div id="t4" class="section">
-        <div style="margin-bottom:10px; font-size:13px; color:#8e8e93; text-align:center;">
-            Расчет для клапана: <span id="tbl_cap_disp" style="font-weight:bold; color:var(--text)">-</span> мл/сек
-        </div>
         <div id="tbl_out"></div>
     </div>
 </div>
 
 <script>
-    // --- Инициализация и LocalStorage ---
-    const IDS = ['c_cap', 'c_ton', 'c_flow', 'z_ton', 'z_tp', 'p_n', 'p_v_rate'];
-    
+    const IDS = ['c_cap', 'c_ton', 'c_flow', 'z_ton', 'z_tp'];
+
     window.onload = function() {
         IDS.forEach(id => {
             let val = localStorage.getItem(id);
             if(val) document.getElementById(id).value = val;
         });
-        doCalc(); // Сразу считаем при загрузке
+        doCalc();
     };
 
     function saveInput(id) {
         localStorage.setItem(id, document.getElementById(id).value);
     }
 
-    // --- Логика переключения вкладок ---
     function showTab(id) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        // Находим кнопку, соответствующую табу
-        const btnId = 'b' + id.replace('t', '');
-        document.getElementById(btnId).classList.add('active');
-        
-        if(id === 't4') makeTable();
+        document.getElementById('b' + id.replace('t', '')).classList.add('active');
+        if(id === 't3') makeTable();
     }
 
-    // --- Калькулятор SSVC (Отбор) ---
+    // --- ГЛАВНЫЙ РАСЧЕТ ---
     function saveAndCalc() {
         ['c_cap', 'c_ton', 'c_flow'].forEach(saveInput);
         doCalc();
     }
 
     function doCalc() {
-        let cp = parseFloat(document.getElementById('c_cap').value); // мл/сек
-        let tn = parseFloat(document.getElementById('c_ton').value); // Ton
-        let fl = parseFloat(document.getElementById('c_flow').value); // Цель мл/час
+        let cp = parseFloat(document.getElementById('c_cap').value);
+        let tn = parseFloat(document.getElementById('c_ton').value);
+        let target_flow = parseFloat(document.getElementById('c_flow').value);
         
-        if(cp > 0 && tn > 0 && fl > 0) {
-            // Формула: (Ton * Cap_ml_sec * 3600) / Flow_target = Tperiod
-            let res = (cp * tn * 3600) / fl;
+        if(cp > 0 && tn > 0 && target_flow > 0) {
+            // 1. Считаем идеальный дробный период
+            let ideal_tp = (cp * tn * 3600) / target_flow;
             
-            // Защита от странных значений
-            if (res < tn) res = tn; // Период не может быть меньше времени открытия
-            
-            let tp_display = res.toFixed(1);
-            if (res > 999) tp_display = "> 999";
+            // 2. Округляем до ближайшего целого (минимум = Ton)
+            let final_tp = Math.round(ideal_tp);
+            if (final_tp < tn) final_tp = Math.ceil(tn); 
+            if (final_tp < 1) final_tp = 1;
 
-            document.getElementById('out_tp').innerText = tp_display;
+            // 3. Считаем, какой отбор получится по факту с этим целым числом
+            let real_flow = (tn / final_tp) * cp * 3600;
+
+            // Вывод
+            document.getElementById('out_tp').innerText = final_tp;
             
-            // Обратный пересчет для проверки точности
-            let realFlow = Math.round((tn / res) * cp * 3600);
-            document.getElementById('real_flow_info').innerText = `Расчетный отбор: ${realFlow} мл/ч`;
+            let flowEl = document.getElementById('real_flow_val');
+            flowEl.innerText = Math.round(real_flow) + " мл/ч";
+
+            // Проверка отклонения
+            let diff = Math.abs(real_flow - target_flow);
+            let percent = (diff / target_flow) * 100;
+            
+            let warn = document.getElementById('diff_warning');
+            
+            if(percent > 5) {
+                flowEl.style.color = "var(--danger)";
+                warn.style.display = "block";
+            } else {
+                flowEl.style.color = "var(--success)";
+                warn.style.display = "none";
+            }
+
         } else {
-            document.getElementById('out_tp').innerText = "0.0";
-            document.getElementById('real_flow_info').innerText = "";
+            document.getElementById('out_tp').innerText = "0";
+            document.getElementById('real_flow_val').innerText = "0 мл/ч";
         }
     }
 
-    // --- Замер (Калибровка) ---
+    // --- ЗАМЕР ---
     function doZamer() {
-        ['z_ton', 'z_tp'].forEach(saveInput); // Сохраняем настройки клапана, остальное нет
-        
+        ['z_ton', 'z_tp'].forEach(saveInput);
         let ml = parseFloat(document.getElementById('z_ml').value);
         let mn = parseFloat(document.getElementById('z_min').value);
         let tn = parseFloat(document.getElementById('z_ton').value);
         let tp = parseFloat(document.getElementById('z_tp').value);
 
         if(ml > 0 && mn > 0 && tn > 0 && tp > 0) {
-            // мл в минуту -> мл в секунду
-            let flow_ml_sec_measured = (ml / mn) / 60;
-            // duty cycle (скважность)
-            let duty = tn / tp;
-            // Пропускная способность (при 100% открытии)
-            let cap = flow_ml_sec_measured / duty;
-            
+            let cap = ((ml / mn) * 60) / (tn / tp) / 3600; // мл/сек
             document.getElementById('z_res').innerText = cap.toFixed(3);
-        } else {
-            document.getElementById('z_res').innerText = "0.00";
         }
     }
 
@@ -208,67 +189,46 @@
         let val = parseFloat(document.getElementById('z_res').innerText);
         if(val > 0) {
             document.getElementById('c_cap').value = val.toFixed(3);
-            localStorage.setItem('c_cap', val.toFixed(3)); // Важно сохранить!
+            localStorage.setItem('c_cap', val.toFixed(3));
             doCalc();
             showTab('t1');
-        } else {
-            alert("Сначала введите данные замера");
         }
     }
 
-    // --- ТЭН ---
-    function doPower() {
-        saveInput('p_n'); saveInput('p_v_rate');
-        
-        let pn = parseFloat(document.getElementById('p_n').value); // Номинал Вт
-        let v_rate = parseFloat(document.getElementById('p_v_rate').value) || 220; // Номинал Вольт
-        let v_act = parseFloat(document.getElementById('p_v_act').value); // Розетка
-
-        if(pn > 0 && v_act > 0) {
-            // R = U^2 / P
-            let resistance = (v_rate * v_rate) / pn;
-            // P_new = U_new^2 / R
-            let pr = Math.round((v_act * v_act) / resistance);
-            
-            document.getElementById('p_res').innerText = pr;
-        } else {
-            document.getElementById('p_res').innerText = "0";
-        }
-    }
-
-    // --- Таблица ---
+    // --- ТАБЛИЦА ---
     function makeTable() {
         let cp = parseFloat(document.getElementById('c_cap').value);
         let tn = parseFloat(document.getElementById('c_ton').value);
         let target = parseFloat(document.getElementById('c_flow').value) || 0;
-        
         let div = document.getElementById('tbl_out');
-        document.getElementById('tbl_cap_disp').innerText = cp || 0;
 
         if(cp > 0 && tn > 0) {
-            let h = '<table><tr><th>Период (SSVC)</th><th>Скорость</th><th>% откр.</th></tr>';
-            
-            // Список популярных периодов + расчетные
-            let periods = [5, 8, 10, 15, 20, 30, 40, 60, 90, 120, 180, 300];
-            
-            periods.forEach(tp => {
+            let h = '<table><tr><th>Период (с)</th><th>Факт (мл/ч)</th><th>Ошибка</th></tr>';
+            // Генерируем диапазон периодов вокруг цели
+            let ideal = (cp * tn * 3600) / (target || 1000);
+            let start = Math.max(Math.floor(ideal) - 5, Math.ceil(tn));
+            let end = Math.ceil(ideal) + 5;
+            if(target === 0) { start = 1; end = 20; }
+
+            for(let tp = start; tp <= end; tp++) {
                 if(tp >= tn) {
                     let flow = ((tn / tp) * cp * 3600);
-                    let percent = Math.round((tn/tp)*100);
+                    let diff = Math.abs(flow - target);
+                    let isBest = (Math.round(tp) === Math.round(Math.max(1, (cp * tn * 3600) / target)));
                     
-                    // Подсветка строки, если она близка к цели (+- 10%)
-                    let highlight = (Math.abs(flow - target) / target < 0.1) ? 'class="highlight"' : '';
+                    // Цвет строки
+                    let bg = isBest ? "background: rgba(52, 199, 89, 0.2);" : "";
                     
-                    h += `<tr ${highlight}>
-                            <td><b>${tp}</b> сек</td>
-                            <td>${Math.round(flow)} мл/ч</td>
-                            <td>${percent}%</td>
+                    h += `<tr style="${bg}">
+                            <td><b>${tp}</b></td>
+                            <td>${Math.round(flow)}</td>
+                            <td>${target > 0 ? (flow - target).toFixed(0) : '-'}</td>
                           </tr>`;
                 }
-            });
-            div.innerHTML = h + '</table>';
+            }
+            div.innerHTML = h + '</table><p style="font-size:12px; color:#888; text-align:center">Показаны ближайшие целые периоды к вашей цели.</p>';
         } else {
-            div.innerHTML = '<p style="text-align:center; padding:30px; opacity:0.6">Заполните данные во вкладке "ОТБОР"</p>';
+            div.innerHTML = '<p style="text-align:center; padding:20px; color:#888">Введите данные в Отбор</p>';
         }
     }
 </script>
